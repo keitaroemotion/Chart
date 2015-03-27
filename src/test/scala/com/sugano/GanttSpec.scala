@@ -13,17 +13,17 @@ import org.jfree.data.gantt.TaskSeries
 import org.jfree.data.gantt.Task
 import org.jfree.data.time.SimpleTimePeriod
 import org.jfree.data.gantt.TaskSeriesCollection
+import org.jfree.chart.plot.CategoryPlot
+import org.jfree.data.category.IntervalCategoryDataset
 
 /**
 import org.jfree.chart.event.ChartChangeEvent
 import org.jfree.chart.event.ChartChangeListener
 import org.jfree.chart.labels.CategoryToolTipGenerator
 import org.jfree.chart.labels.StandardCategoryToolTipGenerator
-import org.jfree.chart.plot.CategoryPlot
 import org.jfree.chart.renderer.category.CategoryItemRenderer
 import org.jfree.chart.urls.CategoryURLGenerator
 import org.jfree.chart.urls.StandardCategoryURLGenerator
-import org.jfree.data.category.IntervalCategoryDataset
 import org.junit.Before
 import org.junit.Test
 import org.junit.Assert.fail
@@ -56,20 +56,42 @@ class GanttSpec extends Specification {
      calendar.getTime();
  }
 
+  def parseData(file:String):List[List[String]] = {
+    val lines = scala.io.Source.fromFile(file).getLines
+    lines.foldLeft(List[List[String]]()){(collection, line) =>
+      collection.+:(line.split(',').toList)
+    }
+  }
 
-  def supplyDataSet() = {
+
+  def parseDate(date:String):List[Int] = {
+    date.replace(" ","").split("/").foldLeft(List[Int]()){(collection, elem) =>
+      collection.+:(elem.toInt)
+    }
+  }
+
+  def supplyDataSet():IntervalCategoryDataset = {
     var series = new TaskSeries("Scheduled")
-    series.add(new Task("task name",
-      new SimpleTimePeriod(
-       date(1, Calendar.APRIL, 2001), date(5, Calendar.APRIL, 2002)
+    for(datum <- parseData(DATA_LOCATION).reverse){
+      val relative_frequency = datum(1)
+      val from_d = parseDate(datum(2))
+      val to_d = parseDate(datum(3))
+
+      series.add(new Task(datum(0)+" ("+datum(1)+")",
+        new SimpleTimePeriod(
+         date(from_d(0), from_d(1)-1, from_d(2)), date(to_d(0), to_d(1)-1, to_d(2))
+        )
+       )
       )
-     )
-    )
+
+    }
+    var collection = new TaskSeriesCollection()
+    collection.add(series)
+    collection
   }
 
  val FRAME_WIDTH = 1000
  val FRAME_HEIGHT = 500
-
 
   /**
       public void testDrawWithNullInfo2() {
@@ -81,15 +103,26 @@ class GanttSpec extends Specification {
     }
   */
 
+  val DATA_LOCATION = "src/data/data"
+
+
   "aaa" should {
+    "parse data" in {
+       val data = parseData(DATA_LOCATION)
+       for (datum <- data){
+         println(datum)
+       }
+       "" == ""
+     }
     "test draw with null info" in {
       var chart = createGanttChart()
+      var plot = chart.getPlot().asInstanceOf[CategoryPlot]
+      plot.setDataset(supplyDataSet)
       var image = supplyImage(FRAME_WIDTH, FRAME_HEIGHT)
       var g2 = image.createGraphics()
       chart.draw(g2, new Rectangle2D.Double(0,0,FRAME_WIDTH,FRAME_HEIGHT), null, null)
       javax.imageio.ImageIO.write(image, "jpg", supplyDestination);
       g2.dispose()
-      println("hihihi")
       "" == ""
     }
   }
