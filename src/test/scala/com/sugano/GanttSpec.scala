@@ -16,20 +16,6 @@ import org.jfree.data.gantt.TaskSeriesCollection
 import org.jfree.chart.plot.CategoryPlot
 import org.jfree.data.category.IntervalCategoryDataset
 
-/**
-import org.jfree.chart.event.ChartChangeEvent
-import org.jfree.chart.event.ChartChangeListener
-import org.jfree.chart.labels.CategoryToolTipGenerator
-import org.jfree.chart.labels.StandardCategoryToolTipGenerator
-import org.jfree.chart.renderer.category.CategoryItemRenderer
-import org.jfree.chart.urls.CategoryURLGenerator
-import org.jfree.chart.urls.StandardCategoryURLGenerator
-import org.junit.Before
-import org.junit.Test
-import org.junit.Assert.fail
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertSame
-*/
 
 class GanttSpec extends Specification {
   def createGanttChart():JFreeChart = {
@@ -63,7 +49,6 @@ class GanttSpec extends Specification {
     }
   }
 
-
   def parseDate(date:String):List[Int] = {
     date.replace(" ","").split("/").foldLeft(List[Int]()){(collection, elem) =>
       collection.+:(elem.toInt)
@@ -92,18 +77,7 @@ class GanttSpec extends Specification {
 
  val FRAME_WIDTH = 1000
  val FRAME_HEIGHT = 500
-
-  /**
-      public void testDrawWithNullInfo2() {
-        JFreeChart chart = createGanttChart();
-        CategoryPlot plot = (CategoryPlot) chart.getPlot();
-        plot.setDataset(createDataset());
-        /* BufferedImage img =*/ chart.createBufferedImage(300, 200, null);
-        //FIXME we should really assert a value
-    }
-  */
-
-  val DATA_LOCATION = "src/data/data"
+ val DATA_LOCATION = "src/data/data"
 
 
   "aaa" should {
